@@ -12,7 +12,8 @@
       "Bash(git remote add:*)",
       "Bash(git branch:*)",
       "Bash(git push:*)",
-      "Bash(start \"\" \"bin\\\\Debug\\\\net6.0-windows\\\\ProjectManager.exe\")"
+      "Bash(start \"\" \"bin\\\\Debug\\\\net6.0-windows\\\\ProjectManager.exe\")",
+      "Bash(start \"\" \"G:\\\\09 dropbox\\\\code\\\\git_repos\\\\projectmanager\\\\bin\\\\Debug\\\\net6.0-windows\\\\ProjectManager.exe\")"
     ]
   }
 }
