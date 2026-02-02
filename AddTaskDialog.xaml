@@ -58,10 +58,10 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="App:" VerticalAlignment="Center" Margin="5"/>
-            <ComboBox Grid.Row="0" Grid.Column="1" Name="cmbApp" Margin="5" Height="25"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" Name="cmbApp" Margin="5" Height="25" Background="White" Foreground="Black"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Priority:" VerticalAlignment="Center" Margin="5"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" Name="cmbPriority" Margin="5" Height="25">
+            <ComboBox Grid.Row="1" Grid.Column="1" Name="cmbPriority" Margin="5" Height="25" Background="White" Foreground="Black">
                 <ComboBoxItem Content="Low"/>
                 <ComboBoxItem Content="Medium" IsSelected="True"/>
                 <ComboBoxItem Content="High"/>

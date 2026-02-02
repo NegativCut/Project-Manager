@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -172,7 +173,7 @@ namespace ProjectManager
                         var lblNoFiles = new TextBlock
                         {
                             Text = "No files in this folder",
-                            Foreground = System.Windows.Media.Brushes.Gray,
+                            Foreground = System.Windows.Media.Brushes.White,
                             Margin = new Thickness(5)
                         };
                         panel.Children.Add(lblNoFiles);
@@ -189,7 +190,7 @@ namespace ProjectManager
                                 HorizontalAlignment = HorizontalAlignment.Left,
                                 Background = System.Windows.Media.Brushes.Transparent,
                                 BorderThickness = new Thickness(0),
-                                Foreground = System.Windows.Media.Brushes.Blue,
+                                Foreground = System.Windows.Media.Brushes.White,
                                 Cursor = Cursors.Hand
                             };
                             fileBtn.Click += (s, e) => OpenFile((string)((Button)s).Tag);
@@ -202,7 +203,7 @@ namespace ProjectManager
                             {
                                 Text = $"... and {files.Length - 20} more files",
                                 Margin = new Thickness(5),
-                                Foreground = System.Windows.Media.Brushes.Gray
+                                Foreground = System.Windows.Media.Brushes.White
                             };
                             panel.Children.Add(lblMore);
                         }
@@ -213,7 +214,7 @@ namespace ProjectManager
                     var lblNotCreated = new TextBlock
                     {
                         Text = "Folder not created yet",
-                        Foreground = System.Windows.Media.Brushes.Orange,
+                        Foreground = System.Windows.Media.Brushes.White,
                         Margin = new Thickness(5)
                     };
                     panel.Children.Add(lblNotCreated);
@@ -293,8 +294,8 @@ namespace ProjectManager
                             continue;
                         }
 
-                        // Detect end of TODO section (next section header with ===)
-                        if (inTodoSection && line.StartsWith("==="))
+                        // Detect end of TODO section (next section header with === or ---)
+                        if (inTodoSection && (line.StartsWith("===") || line.StartsWith("---")))
                         {
                             break;
                         }
@@ -569,9 +570,63 @@ namespace ProjectManager
         {
             if (currentProject != null && cmbStatus.SelectedItem != null)
             {
-                currentProject.Status = ((ComboBoxItem)cmbStatus.SelectedItem).Content.ToString();
+                string newStatus = ((ComboBoxItem)cmbStatus.SelectedItem).Content.ToString();
+                string oldStatus = currentProject.Status;
+
+                currentProject.Status = newStatus;
                 db.UpdateProject(currentProject);
+
+                // Record status change to overview file
+                if (oldStatus != newStatus)
+                {
+                    RecordStatusChange(oldStatus, newStatus);
+                }
+
                 LoadData();
+            }
+        }
+
+        private void RecordStatusChange(string oldStatus, string newStatus)
+        {
+            try
+            {
+                EnsureOverviewFileExists();
+                string filePath = GetOverviewFilePath();
+                if (filePath == null || !File.Exists(filePath)) return;
+
+                string content = File.ReadAllText(filePath);
+                string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                string statusEntry = $"[{timestamp}] Status changed: {oldStatus ?? "None"} -> {newStatus}";
+
+                // Check if STATUS HISTORY section exists
+                if (content.Contains("STATUS HISTORY"))
+                {
+                    // Find the STATUS HISTORY section and append after the divider line
+                    int historyIndex = content.IndexOf("STATUS HISTORY");
+                    int dividerIndex = content.IndexOf("--------------------------------------------------------------------------------", historyIndex);
+                    if (dividerIndex != -1)
+                    {
+                        int insertPos = dividerIndex + "--------------------------------------------------------------------------------".Length;
+                        content = content.Insert(insertPos, "\n" + statusEntry);
+                    }
+                }
+                else
+                {
+                    // Add STATUS HISTORY section before the end
+                    string historySection = $@"
+--------------------------------------------------------------------------------
+STATUS HISTORY
+--------------------------------------------------------------------------------
+{statusEntry}
+";
+                    content += historySection;
+                }
+
+                File.WriteAllText(filePath, content);
+            }
+            catch (Exception ex)
+            {
+                txtStatus.Text = $"Could not record status change: {ex.Message}";
             }
         }
 
@@ -613,11 +668,6 @@ namespace ProjectManager
             {
                 // Create new overview file with template
                 var content = $@"================================================================================
-TODO
-================================================================================
-
-
-================================================================================
 PROJECT OVERVIEW
 ================================================================================
 Project Number: {currentProject.ProjectNumber}
@@ -630,15 +680,86 @@ Status:         {currentProject.Status}
 DESCRIPTION
 --------------------------------------------------------------------------------
 
-
+{GenerateFilesSection()}
+{GenerateDatasheetsSection()}
 --------------------------------------------------------------------------------
 NOTES
 --------------------------------------------------------------------------------
 
 
+================================================================================
+TODO
+================================================================================
+
+
+--------------------------------------------------------------------------------
+STATUS HISTORY
+--------------------------------------------------------------------------------
+
 ";
                 File.WriteAllText(filePath, content);
             }
+        }
+
+        private string GenerateFilesSection()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("FILES BY APPLICATION");
+            sb.AppendLine("--------------------");
+
+            var projectApps = availableApps.Where(a => currentProject.AppIds.Contains(a.Id)).ToList();
+
+            foreach (var app in projectApps)
+            {
+                sb.AppendLine($"\n{app.AppName}:");
+                string appPath = Path.Combine(engineeringRoot, app.AppName, currentProject.FolderName);
+
+                if (Directory.Exists(appPath))
+                {
+                    var files = Directory.GetFiles(appPath, "*.*", SearchOption.AllDirectories);
+                    if (files.Length == 0)
+                    {
+                        sb.AppendLine("  (No files)");
+                    }
+                    else
+                    {
+                        foreach (var file in files)
+                        {
+                            sb.AppendLine($"  - {Path.GetFileName(file)}");
+                        }
+                    }
+                }
+                else
+                {
+                    sb.AppendLine("  (Folder not created)");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private string GenerateDatasheetsSection()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("\nDATASHEETS");
+            sb.AppendLine("----------");
+
+            var datasheetPaths = db.GetDatasheetsForProject(currentProject.Id);
+
+            if (datasheetPaths.Count == 0)
+            {
+                sb.AppendLine("  (No datasheets linked)");
+            }
+            else
+            {
+                foreach (var path in datasheetPaths)
+                {
+                    string fileName = Path.GetFileName(path);
+                    sb.AppendLine($"  - {fileName}");
+                }
+            }
+
+            return sb.ToString();
         }
 
         private void BtnOpenOverview_Click(object sender, RoutedEventArgs e)
@@ -658,6 +779,194 @@ NOTES
             catch (Exception ex)
             {
                 MessageBox.Show($"Could not open overview file:\n{ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BtnPrintOverview_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentProject == null) return;
+
+            try
+            {
+                EnsureOverviewFileExists();
+                string filePath = GetOverviewFilePath();
+                if (File.Exists(filePath))
+                {
+                    Process.Start(new ProcessStartInfo(filePath)
+                    {
+                        UseShellExecute = true,
+                        Verb = "print"
+                    });
+                    txtStatus.Text = "Printing overview file";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not print overview file:\n{ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BtnRegenerateOverview_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentProject == null) return;
+
+            try
+            {
+                string filePath = GetOverviewFilePath();
+                string existingTodoContent = "";
+                string existingStatusHistory = "";
+                string existingNotes = "";
+                string existingDescription = "";
+
+                // Extract existing content if file exists
+                if (filePath != null && File.Exists(filePath))
+                {
+                    string content = File.ReadAllText(filePath);
+
+                    // Extract TODO items
+                    int todoStart = content.IndexOf("TODO");
+                    if (todoStart != -1)
+                    {
+                        int todoContentStart = content.IndexOf("===", todoStart);
+                        if (todoContentStart != -1)
+                        {
+                            todoContentStart = content.IndexOf("\n", todoContentStart) + 1;
+                            int todoEnd = content.IndexOf("---", todoContentStart);
+                            if (todoEnd == -1) todoEnd = content.IndexOf("===", todoContentStart);
+                            if (todoEnd == -1) todoEnd = content.Length;
+                            existingTodoContent = content.Substring(todoContentStart, todoEnd - todoContentStart).Trim();
+                        }
+                    }
+
+                    // Extract STATUS HISTORY
+                    int statusStart = content.IndexOf("STATUS HISTORY");
+                    if (statusStart != -1)
+                    {
+                        int statusContentStart = content.IndexOf("---", statusStart);
+                        if (statusContentStart != -1)
+                        {
+                            statusContentStart = content.IndexOf("\n", statusContentStart) + 1;
+                            int statusEnd = content.IndexOf("===", statusContentStart);
+                            if (statusEnd == -1) statusEnd = content.Length;
+                            existingStatusHistory = content.Substring(statusContentStart, statusEnd - statusContentStart).Trim();
+                        }
+                    }
+
+                    // Extract NOTES
+                    int notesStart = content.IndexOf("NOTES");
+                    if (notesStart != -1)
+                    {
+                        int notesContentStart = content.IndexOf("---", notesStart);
+                        if (notesContentStart != -1)
+                        {
+                            notesContentStart = content.IndexOf("\n", notesContentStart) + 1;
+                            int notesEnd = content.IndexOf("===", notesContentStart);
+                            if (notesEnd == -1) notesEnd = content.IndexOf("---", notesContentStart);
+                            if (notesEnd == -1) notesEnd = content.Length;
+                            existingNotes = content.Substring(notesContentStart, notesEnd - notesContentStart).Trim();
+                        }
+                    }
+
+                    File.Delete(filePath);
+                }
+
+                // Create new file with preserved content
+                string directory = Path.GetDirectoryName(filePath);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                var newContent = $@"================================================================================
+PROJECT OVERVIEW
+================================================================================
+Project Number: {currentProject.ProjectNumber}
+Project Name:   {currentProject.ProjectName}
+Revision:       {currentProject.RevisionNumber}
+Created:        {currentProject.DateCreated:yyyy-MM-dd}
+Status:         {currentProject.Status}
+
+--------------------------------------------------------------------------------
+DESCRIPTION
+--------------------------------------------------------------------------------
+
+{GenerateFilesSection()}
+{GenerateDatasheetsSection()}
+--------------------------------------------------------------------------------
+NOTES
+--------------------------------------------------------------------------------
+{(string.IsNullOrEmpty(existingNotes) ? "" : existingNotes + "\n")}
+
+================================================================================
+TODO
+================================================================================
+{(string.IsNullOrEmpty(existingTodoContent) ? "" : existingTodoContent + "\n")}
+
+--------------------------------------------------------------------------------
+STATUS HISTORY
+--------------------------------------------------------------------------------
+{(string.IsNullOrEmpty(existingStatusHistory) ? "" : existingStatusHistory + "\n")}
+";
+                File.WriteAllText(filePath, newContent);
+                txtStatus.Text = "Overview file regenerated (TODO items and history preserved)";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not regenerate overview file:\n{ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BtnRefreshOverview_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentProject == null) return;
+
+            try
+            {
+                EnsureOverviewFileExists();
+                string filePath = GetOverviewFilePath();
+                if (filePath == null || !File.Exists(filePath)) return;
+
+                string content = File.ReadAllText(filePath);
+
+                // Find DESCRIPTION section and NOTES section
+                int descIndex = content.IndexOf("DESCRIPTION");
+                int notesIndex = content.IndexOf("NOTES");
+
+                if (descIndex == -1 || notesIndex == -1)
+                {
+                    MessageBox.Show("Could not find DESCRIPTION or NOTES section in overview file.", "Error",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Find the divider after DESCRIPTION
+                int descDividerEnd = content.IndexOf("--------------------------------------------------------------------------------", descIndex);
+                if (descDividerEnd != -1)
+                {
+                    descDividerEnd = content.IndexOf("\n", descDividerEnd) + 1;
+                }
+
+                // Find the divider before NOTES
+                int notesDividerStart = content.LastIndexOf("--------------------------------------------------------------------------------", notesIndex);
+
+                if (descDividerEnd != -1 && notesDividerStart != -1 && notesDividerStart > descDividerEnd)
+                {
+                    // Replace content between DESCRIPTION divider and NOTES divider
+                    string newContent = content.Substring(0, descDividerEnd) +
+                                       "\n" + GenerateFilesSection() +
+                                       GenerateDatasheetsSection() +
+                                       content.Substring(notesDividerStart);
+
+                    File.WriteAllText(filePath, newContent);
+                    txtStatus.Text = "Overview file refreshed with current files and datasheets";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not refresh overview file:\n{ex.Message}", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
