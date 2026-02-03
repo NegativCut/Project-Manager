@@ -522,6 +522,139 @@ namespace ProjectManager
             txtStatus.Text = "Refreshed";
         }
 
+        private void BtnTodoFile_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("==============================================================================");
+                sb.AppendLine("OUTSTANDING TODO ITEMS");
+                sb.AppendLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                sb.AppendLine("==============================================================================");
+                sb.AppendLine();
+
+                // Get all projects ordered by project number descending (highest first)
+                var projects = db.GetAllProjects();
+                int totalOutstanding = 0;
+
+                foreach (var project in projects)
+                {
+                    // Get the overview file path for this project
+                    string documentsPath = Path.Combine(engineeringRoot, "Documents", project.FolderName);
+                    string overviewPath = Path.Combine(documentsPath, $"{project.FolderName}_Overview.txt");
+
+                    var outstandingTodos = new List<string>();
+
+                    if (File.Exists(overviewPath))
+                    {
+                        string[] lines = File.ReadAllLines(overviewPath);
+                        bool inTodoSection = false;
+                        bool foundTodoHeader = false;
+
+                        foreach (string line in lines)
+                        {
+                            string trimmed = line.Trim();
+
+                            // Detect TODO section header
+                            if (trimmed == "TODO")
+                            {
+                                foundTodoHeader = true;
+                                continue;
+                            }
+
+                            // After finding TODO header, the next === line starts the content area
+                            if (foundTodoHeader && trimmed.StartsWith("==="))
+                            {
+                                inTodoSection = true;
+                                foundTodoHeader = false;
+                                continue;
+                            }
+
+                            // Detect end of TODO section
+                            if (inTodoSection && (trimmed.StartsWith("===") || trimmed.StartsWith("---")))
+                            {
+                                break;
+                            }
+
+                            // Parse only incomplete TODO items: [ ]
+                            if (inTodoSection)
+                            {
+                                string lineTrimmed = line.TrimStart();
+                                if (lineTrimmed.StartsWith("[ ]"))
+                                {
+                                    // Extract the todo text (remove [ ] prefix)
+                                    string todoText = lineTrimmed.Substring(3).TrimStart();
+                                    outstandingTodos.Add(todoText);
+                                }
+                            }
+                        }
+                    }
+
+                    // Only add project to output if it has outstanding todos
+                    if (outstandingTodos.Count > 0)
+                    {
+                        sb.AppendLine("------------------------------------------------------------------------------");
+                        sb.AppendLine($"{project.DisplayName}");
+                        sb.AppendLine("------------------------------------------------------------------------------");
+
+                        foreach (var todo in outstandingTodos)
+                        {
+                            // Format: "  [ ] [timestamp] description"
+                            // Wrap long descriptions so continuation lines align with description start
+                            string prefix = "  [ ] ";
+                            string fullLine = prefix + todo;
+
+                            // Find where the description starts (after the timestamp)
+                            // Timestamp format: [yyyy-MM-dd HH:mm] = 18 chars + space = 19 chars
+                            int descStartPos = prefix.Length;
+                            if (todo.StartsWith("["))
+                            {
+                                int closeBracket = todo.IndexOf(']');
+                                if (closeBracket > 0)
+                                {
+                                    descStartPos = prefix.Length + closeBracket + 2; // +2 for ] and space
+                                }
+                            }
+
+                            const int maxLineWidth = 78;
+                            string indent = new string(' ', descStartPos);
+
+                            if (fullLine.Length <= maxLineWidth)
+                            {
+                                sb.AppendLine(fullLine);
+                            }
+                            else
+                            {
+                                // Word wrap with aligned continuation
+                                sb.AppendLine(WrapTodoLine(fullLine, maxLineWidth, indent));
+                            }
+                            totalOutstanding++;
+                        }
+
+                        sb.AppendLine();
+                    }
+                }
+
+                if (totalOutstanding == 0)
+                {
+                    sb.AppendLine("No outstanding TODO items found.");
+                }
+
+                // Save to file in engineering root
+                string todoFilePath = Path.Combine(engineeringRoot, "OutstandingTodos.txt");
+                File.WriteAllText(todoFilePath, sb.ToString());
+
+                // Open the file
+                Process.Start(new ProcessStartInfo(todoFilePath) { UseShellExecute = true });
+                txtStatus.Text = $"Todo file generated: {totalOutstanding} outstanding items";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not generate todo file:\n{ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Only handle if it's the main tabControl and we have a current project
@@ -1411,6 +1544,70 @@ STATUS HISTORY
             }
         }
 
+        private void BtnMoveTaskUp_Click(object sender, RoutedEventArgs e)
+        {
+            MoveTask(-1);
+        }
+
+        private void BtnMoveTaskDown_Click(object sender, RoutedEventArgs e)
+        {
+            MoveTask(1);
+        }
+
+        private void MoveTask(int direction)
+        {
+            if (currentProject == null || dgTasks.SelectedItem == null) return;
+
+            var todo = dgTasks.SelectedItem as FileTodoItem;
+            if (todo == null) return;
+
+            int selectedIndex = dgTasks.SelectedIndex;
+
+            try
+            {
+                string filePath = GetOverviewFilePath();
+                if (filePath == null || !File.Exists(filePath)) return;
+
+                var lines = File.ReadAllLines(filePath).ToList();
+                var todos = dgTasks.ItemsSource as List<FileTodoItem>;
+                if (todos == null) return;
+
+                int targetIndex = selectedIndex + direction;
+
+                // Check bounds
+                if (targetIndex < 0 || targetIndex >= todos.Count) return;
+
+                var targetTodo = todos[targetIndex];
+
+                // Swap the lines in the file
+                int lineA = todo.LineNumber;
+                int lineB = targetTodo.LineNumber;
+
+                if (lineA >= 0 && lineA < lines.Count && lineB >= 0 && lineB < lines.Count)
+                {
+                    string temp = lines[lineA];
+                    lines[lineA] = lines[lineB];
+                    lines[lineB] = temp;
+
+                    File.WriteAllLines(filePath, lines);
+                    LoadTasks(currentProject);
+
+                    // Reselect the moved item
+                    if (targetIndex >= 0 && targetIndex < dgTasks.Items.Count)
+                    {
+                        dgTasks.SelectedIndex = targetIndex;
+                    }
+
+                    txtStatus.Text = direction < 0 ? "Task moved up" : "Task moved down";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not move task:\n{ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void BtnRefreshTasks_Click(object sender, RoutedEventArgs e)
         {
             if (currentProject != null)
@@ -1434,6 +1631,45 @@ STATUS HISTORY
             {
                 Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
             }
+        }
+
+        private string WrapTodoLine(string line, int maxWidth, string continuationIndent)
+        {
+            var result = new StringBuilder();
+            int currentPos = 0;
+            bool firstLine = true;
+
+            while (currentPos < line.Length)
+            {
+                int availableWidth = firstLine ? maxWidth : maxWidth - continuationIndent.Length;
+                string currentLine = firstLine ? "" : continuationIndent;
+                string remaining = line.Substring(currentPos);
+
+                if (remaining.Length <= availableWidth)
+                {
+                    result.AppendLine(currentLine + remaining);
+                    break;
+                }
+
+                // Find last space within available width
+                int breakPos = remaining.LastIndexOf(' ', Math.Min(availableWidth, remaining.Length - 1));
+                if (breakPos <= 0)
+                {
+                    // No space found, force break at max width
+                    breakPos = availableWidth;
+                }
+
+                result.AppendLine(currentLine + remaining.Substring(0, breakPos).TrimEnd());
+                currentPos += breakPos;
+
+                // Skip the space we broke at
+                while (currentPos < line.Length && line[currentPos] == ' ')
+                    currentPos++;
+
+                firstLine = false;
+            }
+
+            return result.ToString().TrimEnd('\r', '\n');
         }
     }
 }

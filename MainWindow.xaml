@@ -127,6 +127,7 @@
             <Button Name="btnNewRevision" Content="New Revision" Width="110" Height="32" Margin="5" Click="BtnNewRevision_Click"/>
             <Button Name="btnManageApps" Content="Manage Apps" Width="110" Height="32" Margin="5" Click="BtnManageApps_Click"/>
             <Button Name="btnSettings" Content="Settings" Width="110" Height="32" Margin="5" Click="BtnSettings_Click"/>
+            <Button Name="btnTodoFile" Content="Todo File" Width="100" Height="32" Margin="5" Click="BtnTodoFile_Click"/>
             <Button Name="btnRefresh" Content="Refresh" Width="90" Height="32" Margin="5" Click="BtnRefresh_Click"/>
         </StackPanel>
         </Border>
@@ -310,6 +311,8 @@
                             <Button Name="btnAddTask" Content="Add Task" Width="100" Margin="5" Click="BtnAddTask_Click"/>
                             <Button Name="btnToggleTask" Content="Toggle Done" Width="100" Margin="5" Click="BtnToggleTask_Click"/>
                             <Button Name="btnDeleteTask" Content="Delete Task" Width="100" Margin="5" Click="BtnDeleteTask_Click"/>
+                            <Button Name="btnMoveTaskUp" Content="▲ Up" Width="60" Margin="5" Click="BtnMoveTaskUp_Click"/>
+                            <Button Name="btnMoveTaskDown" Content="▼ Down" Width="60" Margin="5" Click="BtnMoveTaskDown_Click"/>
                             <Button Name="btnRefreshTasks" Content="Refresh" Width="80" Margin="5" Click="BtnRefreshTasks_Click"/>
                             <Button Name="btnOpenOverviewFromTasks" Content="Open File" Width="80" Margin="5" Click="BtnOpenOverview_Click"/>
                         </StackPanel>
