@@ -7,10 +7,16 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>ProjectManager</AssemblyName>
     <RootNamespace>ProjectManager</RootNamespace>
+    <ApplicationIcon>icons\256x256.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="icons\*.png" />
+    <Resource Include="icons\*.ico" />
   </ItemGroup>
 
 </Project>

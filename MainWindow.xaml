@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Engineering Project Manager" Height="750" Width="1400"
         WindowStartupLocation="CenterScreen" WindowState="Maximized"
-        Background="#FF1E1E1E">
+        Background="#FF1E1E1E"
+        Icon="icons/32x32.png">
     <Window.Resources>
         <!-- Dark Theme Colors -->
         <SolidColorBrush x:Key="BackgroundDark" Color="#FF1E1E1E"/>
