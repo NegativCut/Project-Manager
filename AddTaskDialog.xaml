@@ -74,8 +74,8 @@
                  VerticalScrollBarVisibility="Auto" Margin="0,0,0,10"/>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Name="btnAdd" Content="Add Task" Width="100" Height="30" Margin="5" Click="BtnAdd_Click"/>
-            <Button Name="btnCancel" Content="Cancel" Width="80" Height="30" Margin="5" Click="BtnCancel_Click"/>
+            <Button Name="btnAdd" Content="Add Task" Width="100" Height="30" Margin="5" Click="BtnAdd_Click" IsDefault="True"/>
+            <Button Name="btnCancel" Content="Cancel" Width="80" Height="30" Margin="5" Click="BtnCancel_Click" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

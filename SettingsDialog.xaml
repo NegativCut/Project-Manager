@@ -75,8 +75,8 @@
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Name="btnSave" Content="Save" Width="80" Height="30" Margin="5" Click="BtnSave_Click"/>
-            <Button Name="btnCancel" Content="Cancel" Width="80" Height="30" Margin="5" Click="BtnCancel_Click"/>
+            <Button Name="btnSave" Content="Save" Width="80" Height="30" Margin="5" Click="BtnSave_Click" IsDefault="True"/>
+            <Button Name="btnCancel" Content="Cancel" Width="80" Height="30" Margin="5" Click="BtnCancel_Click" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

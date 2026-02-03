@@ -65,8 +65,8 @@
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Name="btnOK" Content="Create Revision" Width="120" Height="30" Margin="5" Click="BtnOK_Click"/>
-            <Button Name="btnCancel" Content="Cancel" Width="100" Height="30" Margin="5" Click="BtnCancel_Click"/>
+            <Button Name="btnOK" Content="Create Revision" Width="120" Height="30" Margin="5" Click="BtnOK_Click" IsDefault="True"/>
+            <Button Name="btnCancel" Content="Cancel" Width="100" Height="30" Margin="5" Click="BtnCancel_Click" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

@@ -1011,7 +1011,8 @@ STATUS HISTORY
                 Margin = new Thickness(5),
                 Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF0E639C")),
                 Foreground = Brushes.White,
-                BorderThickness = new Thickness(0)
+                BorderThickness = new Thickness(0),
+                IsDefault = true
             };
             var cancelButton = new Button
             {
@@ -1021,7 +1022,8 @@ STATUS HISTORY
                 Margin = new Thickness(5),
                 Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF3F3F46")),
                 Foreground = Brushes.White,
-                BorderThickness = new Thickness(0)
+                BorderThickness = new Thickness(0),
+                IsCancel = true
             };
 
             okButton.Click += (s, args) => { inputDialog.DialogResult = true; };
