@@ -1,15 +1,15 @@
 <Window x:Class="ProjectManager.NewRevisionDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Create New Revision" Height="400" Width="500"
+        Title="Create New Revision" Height="460" Width="560"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
-        Background="#FF1E1E1E">
+        Background="#FF1E1E1E" FontSize="14">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Background" Value="#FF0E639C"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Padding" Value="12,6"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style TargetType="GroupBox">
@@ -37,7 +37,7 @@
         <GroupBox Grid.Row="0" Header="New Revision Information" Margin="0,0,0,10">
             <Grid Margin="10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="135"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -65,8 +65,8 @@
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Name="btnOK" Content="Create Revision" Width="120" Height="30" Margin="5" Click="BtnOK_Click" IsDefault="True"/>
-            <Button Name="btnCancel" Content="Cancel" Width="100" Height="30" Margin="5" Click="BtnCancel_Click" IsCancel="True"/>
+            <Button Name="btnOK" Content="Create Revision" Width="135" Height="34" Margin="5" Click="BtnOK_Click" IsDefault="True"/>
+            <Button Name="btnCancel" Content="Cancel" Width="110" Height="34" Margin="5" Click="BtnCancel_Click" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>

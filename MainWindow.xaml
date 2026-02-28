@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Engineering Project Manager" Height="750" Width="1400"
         WindowStartupLocation="CenterScreen" WindowState="Maximized"
-        Background="#FF1E1E1E"
+        Background="#FF1E1E1E" FontSize="14"
         Icon="icons/32x32.png">
     <Window.Resources>
         <!-- Dark Theme Colors -->
@@ -20,7 +20,7 @@
             <Setter Property="Background" Value="#FF0E639C"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Padding" Value="12,6"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style TargetType="GroupBox">
@@ -88,13 +88,13 @@
         <Style TargetType="DataGridColumnHeader">
             <Setter Property="Background" Value="#FF3F3F46"/>
             <Setter Property="Foreground" Value="#FFE0E0E0"/>
-            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Padding" Value="10,6"/>
             <Setter Property="BorderBrush" Value="#FF4F4F56"/>
             <Setter Property="BorderThickness" Value="0,0,1,0"/>
         </Style>
         <Style TargetType="DataGridCell">
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="4"/>
+            <Setter Property="Padding" Value="6"/>
             <Setter Property="Foreground" Value="#FFE0E0E0"/>
         </Style>
         <Style TargetType="DataGridRow">
@@ -118,25 +118,25 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <!-- Toolbar -->
         <Border Grid.Row="0" Background="#FF2D2D30" Padding="10">
         <StackPanel Orientation="Horizontal">
-            <Button Name="btnNewProject" Content="New Project" Width="110" Height="32" Margin="5" Click="BtnNewProject_Click"/>
-            <Button Name="btnNewRevision" Content="New Revision" Width="110" Height="32" Margin="5" Click="BtnNewRevision_Click"/>
-            <Button Name="btnManageApps" Content="Manage Apps" Width="110" Height="32" Margin="5" Click="BtnManageApps_Click"/>
-            <Button Name="btnSettings" Content="Settings" Width="110" Height="32" Margin="5" Click="BtnSettings_Click"/>
-            <Button Name="btnTodoFile" Content="Todo File" Width="100" Height="32" Margin="5" Click="BtnTodoFile_Click"/>
-            <Button Name="btnRefresh" Content="Refresh" Width="90" Height="32" Margin="5" Click="BtnRefresh_Click"/>
+            <Button Name="btnNewProject" Content="New Project" Width="125" Height="36" Margin="5" Click="BtnNewProject_Click"/>
+            <Button Name="btnNewRevision" Content="New Revision" Width="125" Height="36" Margin="5" Click="BtnNewRevision_Click"/>
+            <Button Name="btnManageApps" Content="Manage Apps" Width="125" Height="36" Margin="5" Click="BtnManageApps_Click"/>
+            <Button Name="btnSettings" Content="Settings" Width="110" Height="36" Margin="5" Click="BtnSettings_Click"/>
+            <Button Name="btnTodoFile" Content="Todo File" Width="110" Height="36" Margin="5" Click="BtnTodoFile_Click"/>
+            <Button Name="btnRefresh" Content="Refresh" Width="100" Height="36" Margin="5" Click="BtnRefresh_Click"/>
         </StackPanel>
         </Border>
 
         <!-- Main Content -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="360"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -149,7 +149,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBox Name="txtSearch" Grid.Row="0" Margin="5,5,5,10" Height="25"
+                    <TextBox Name="txtSearch" Grid.Row="0" Margin="5,5,5,10" Height="30"
                              TextChanged="TxtSearch_TextChanged"
                              Foreground="Gray" Text="Search projects..."/>
 
@@ -158,10 +158,10 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="5">
-                                    <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" FontSize="13"/>
+                                    <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" FontSize="15"/>
                                     <TextBlock Text="{Binding DateCreated, StringFormat='Created: {0:yyyy-MM-dd}'}"
-                                               FontSize="11" Foreground="#FF9D9D9D"/>
-                                    <TextBlock Text="{Binding Status}" FontSize="11" Foreground="#FF3794FF"/>
+                                               FontSize="13" Foreground="#FF9D9D9D"/>
+                                    <TextBlock Text="{Binding Status}" FontSize="13" Foreground="#FF3794FF"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -181,7 +181,7 @@
                             <GroupBox Header="Project Information">
                                 <Grid Margin="10">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="120"/>
+                                        <ColumnDefinition Width="135"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
@@ -203,7 +203,7 @@
                                     <TextBlock Grid.Row="2" Grid.Column="1" Name="txtDateCreated" Margin="5" VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Row="3" Grid.Column="0" Text="Status:" Margin="5" VerticalAlignment="Center"/>
-                                    <ComboBox Grid.Row="3" Grid.Column="1" Name="cmbStatus" Margin="5" Height="25" Background="White" Foreground="Black" SelectionChanged="CmbStatus_SelectionChanged">
+                                    <ComboBox Grid.Row="3" Grid.Column="1" Name="cmbStatus" Margin="5" Height="30" Background="White" Foreground="Black" SelectionChanged="CmbStatus_SelectionChanged">
                                         <ComboBoxItem Content="Planning"/>
                                         <ComboBoxItem Content="In Progress"/>
                                         <ComboBoxItem Content="Review"/>
@@ -216,7 +216,7 @@
                                     <StackPanel Grid.Row="4" Grid.Column="1" Name="pnlAppsUsed" Margin="5"/>
 
                                     <TextBlock Grid.Row="5" Grid.Column="0" Text="Issues/Notes:" Margin="5" VerticalAlignment="Top" Padding="0,5,0,0"/>
-                                    <TextBox Grid.Row="5" Grid.Column="1" Name="txtIssues" Margin="5" Height="80" 
+                                    <TextBox Grid.Row="5" Grid.Column="1" Name="txtIssues" Margin="5" Height="90"
                                              TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
                                              LostFocus="TxtIssues_LostFocus"/>
                                 </Grid>
@@ -225,31 +225,31 @@
                             <GroupBox Header="Project Notes" Margin="0,10,0,0">
                                 <StackPanel Margin="10" Orientation="Horizontal">
                                     <Button Name="btnOpenOverview" Content="Open Overview"
-                                            Margin="5" Click="BtnOpenOverview_Click" Width="110"/>
+                                            Margin="5" Click="BtnOpenOverview_Click" Width="125"/>
                                     <Button Name="btnRefreshOverview" Content="Refresh"
-                                            Margin="5" Click="BtnRefreshOverview_Click" Width="80"/>
+                                            Margin="5" Click="BtnRefreshOverview_Click" Width="90"/>
                                     <Button Name="btnRegenerateOverview" Content="Regenerate"
-                                            Margin="5" Click="BtnRegenerateOverview_Click" Width="90"/>
+                                            Margin="5" Click="BtnRegenerateOverview_Click" Width="105"/>
                                     <Button Name="btnPrintOverview" Content="Print"
-                                            Margin="5" Click="BtnPrintOverview_Click" Width="70"/>
+                                            Margin="5" Click="BtnPrintOverview_Click" Width="80"/>
                                     <Button Name="btnAddTodoItem" Content="Add TODO"
-                                            Margin="5" Click="BtnAddTodoItem_Click" Width="90"/>
+                                            Margin="5" Click="BtnAddTodoItem_Click" Width="100"/>
                                 </StackPanel>
                             </GroupBox>
 
                             <GroupBox Header="Quick Actions" Margin="0,10,0,0">
                                 <StackPanel Margin="10">
                                     <Button Name="btnOpenProjectRoot" Content="Open Engineering Root Folder"
-                                            Margin="5" Click="BtnOpenProjectRoot_Click" HorizontalAlignment="Left" Width="250"/>
+                                            Margin="5" Click="BtnOpenProjectRoot_Click" HorizontalAlignment="Left" Width="280"/>
                                 </StackPanel>
                             </GroupBox>
 
                             <GroupBox Header="Project Management" Margin="0,10,0,0">
                                 <StackPanel Margin="10" Orientation="Horizontal">
                                     <Button Name="btnRenameProject" Content="Rename Project"
-                                            Margin="5" Click="BtnRenameProject_Click" Width="120"/>
+                                            Margin="5" Click="BtnRenameProject_Click" Width="140"/>
                                     <Button Name="btnDeleteProject" Content="Delete Project"
-                                            Margin="5" Click="BtnDeleteProject_Click" Width="120" Background="#FF9C2D0E"/>
+                                            Margin="5" Click="BtnDeleteProject_Click" Width="140" Background="#FF9C2D0E"/>
                                 </StackPanel>
                             </GroupBox>
                         </StackPanel>
@@ -265,8 +265,8 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10,10,10,5">
-                            <Button Name="btnRefreshFiles" Content="Refresh Files" Width="120" Margin="5" Click="BtnRefreshFiles_Click"/>
-                            <Button Name="btnOpenAllFolders" Content="Open All Folders" Width="120" Margin="5" Click="BtnOpenAllFolders_Click"/>
+                            <Button Name="btnRefreshFiles" Content="Refresh Files" Width="135" Margin="5" Click="BtnRefreshFiles_Click"/>
+                            <Button Name="btnOpenAllFolders" Content="Open All Folders" Width="135" Margin="5" Click="BtnOpenAllFolders_Click"/>
                         </StackPanel>
 
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
@@ -284,9 +284,9 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Margin="10" Orientation="Horizontal">
-                            <Button Name="btnAddDatasheet" Content="Link Datasheet" Width="130" Margin="5" Click="BtnAddDatasheet_Click"/>
-                            <Button Name="btnRemoveDatasheet" Content="Remove Link" Width="130" Margin="5" Click="BtnRemoveDatasheet_Click"/>
-                            <Button Name="btnOpenDatasheetFolder" Content="Open Datasheet Folder" Width="170" Margin="5" Click="BtnOpenDatasheetFolder_Click"/>
+                            <Button Name="btnAddDatasheet" Content="Link Datasheet" Width="145" Margin="5" Click="BtnAddDatasheet_Click"/>
+                            <Button Name="btnRemoveDatasheet" Content="Remove Link" Width="145" Margin="5" Click="BtnRemoveDatasheet_Click"/>
+                            <Button Name="btnOpenDatasheetFolder" Content="Open Datasheet Folder" Width="190" Margin="5" Click="BtnOpenDatasheetFolder_Click"/>
                         </StackPanel>
 
                         <DataGrid Grid.Row="1" Name="dgDatasheets" Margin="10" AutoGenerateColumns="False" 
@@ -309,13 +309,13 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="10">
-                            <Button Name="btnAddTask" Content="Add Task" Width="100" Margin="5" Click="BtnAddTask_Click"/>
-                            <Button Name="btnToggleTask" Content="Toggle Done" Width="100" Margin="5" Click="BtnToggleTask_Click"/>
-                            <Button Name="btnDeleteTask" Content="Delete Task" Width="100" Margin="5" Click="BtnDeleteTask_Click"/>
-                            <Button Name="btnMoveTaskUp" Content="▲ Up" Width="60" Margin="5" Click="BtnMoveTaskUp_Click"/>
-                            <Button Name="btnMoveTaskDown" Content="▼ Down" Width="60" Margin="5" Click="BtnMoveTaskDown_Click"/>
-                            <Button Name="btnRefreshTasks" Content="Refresh" Width="80" Margin="5" Click="BtnRefreshTasks_Click"/>
-                            <Button Name="btnOpenOverviewFromTasks" Content="Open File" Width="80" Margin="5" Click="BtnOpenOverview_Click"/>
+                            <Button Name="btnAddTask" Content="Add Task" Width="110" Margin="5" Click="BtnAddTask_Click"/>
+                            <Button Name="btnToggleTask" Content="Toggle Done" Width="115" Margin="5" Click="BtnToggleTask_Click"/>
+                            <Button Name="btnDeleteTask" Content="Delete Task" Width="115" Margin="5" Click="BtnDeleteTask_Click"/>
+                            <Button Name="btnMoveTaskUp" Content="▲ Up" Width="70" Margin="5" Click="BtnMoveTaskUp_Click"/>
+                            <Button Name="btnMoveTaskDown" Content="▼ Down" Width="75" Margin="5" Click="BtnMoveTaskDown_Click"/>
+                            <Button Name="btnRefreshTasks" Content="Refresh" Width="90" Margin="5" Click="BtnRefreshTasks_Click"/>
+                            <Button Name="btnOpenOverviewFromTasks" Content="Open File" Width="90" Margin="5" Click="BtnOpenOverview_Click"/>
                         </StackPanel>
 
                         <DataGrid Grid.Row="1" Name="dgTasks" Margin="10" AutoGenerateColumns="False"

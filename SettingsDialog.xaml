@@ -1,15 +1,15 @@
 <Window x:Class="ProjectManager.SettingsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Settings" Height="320" Width="550"
+        Title="Settings" Height="380" Width="620"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
-        Background="#FF1E1E1E">
+        Background="#FF1E1E1E" FontSize="14">
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Background" Value="#FF0E639C"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Padding" Value="12,6"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style TargetType="GroupBox">
@@ -41,9 +41,9 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBox Name="txtEngineeringRoot" Grid.Column="0" Height="25"
+                <TextBox Name="txtEngineeringRoot" Grid.Column="0" Height="30"
                          VerticalContentAlignment="Center" Margin="0,0,10,0"/>
-                <Button Name="btnBrowse" Grid.Column="1" Content="Browse..." Width="80" Height="25" Click="BtnBrowse_Click"/>
+                <Button Name="btnBrowse" Grid.Column="1" Content="Browse..." Width="90" Height="30" Click="BtnBrowse_Click"/>
             </Grid>
         </GroupBox>
 
@@ -54,9 +54,9 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBox Name="txtDatasheetsPath" Grid.Column="0" Height="25"
+                <TextBox Name="txtDatasheetsPath" Grid.Column="0" Height="30"
                          VerticalContentAlignment="Center" Margin="0,0,10,0"/>
-                <Button Name="btnBrowseDatasheets" Grid.Column="1" Content="Browse..." Width="80" Height="25" Click="BtnBrowseDatasheets_Click"/>
+                <Button Name="btnBrowseDatasheets" Grid.Column="1" Content="Browse..." Width="90" Height="30" Click="BtnBrowseDatasheets_Click"/>
             </Grid>
         </GroupBox>
 
@@ -75,8 +75,8 @@
         </GroupBox>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Name="btnSave" Content="Save" Width="80" Height="30" Margin="5" Click="BtnSave_Click" IsDefault="True"/>
-            <Button Name="btnCancel" Content="Cancel" Width="80" Height="30" Margin="5" Click="BtnCancel_Click" IsCancel="True"/>
+            <Button Name="btnSave" Content="Save" Width="90" Height="34" Margin="5" Click="BtnSave_Click" IsDefault="True"/>
+            <Button Name="btnCancel" Content="Cancel" Width="90" Height="34" Margin="5" Click="BtnCancel_Click" IsCancel="True"/>
         </StackPanel>
     </Grid>
 </Window>
