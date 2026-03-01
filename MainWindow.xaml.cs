@@ -951,7 +951,6 @@ STATUS HISTORY
                 string existingTodoContent = "";
                 string existingStatusHistory = "";
                 string existingNotes = "";
-                string existingDescription = "";
 
                 // Extract existing content if file exists
                 if (filePath != null && File.Exists(filePath))
