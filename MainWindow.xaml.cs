@@ -64,9 +64,9 @@ namespace ProjectManager
         {
             availableApps = db.GetAllApps();
             allProjects = db.GetAllProjects();
-            lstProjects.ItemsSource = allProjects;
-            
-            if (allProjects.Count > 0)
+            ApplyProjectFilter();
+
+            if (lstProjects.Items.Count > 0)
             {
                 lstProjects.SelectedIndex = 0;
             }
@@ -667,26 +667,32 @@ namespace ProjectManager
             }
         }
 
-        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        private void ApplyProjectFilter()
         {
             if (allProjects == null) return;
 
+            bool showCancelled = chkShowCancelled.IsChecked == true;
             string searchText = txtSearch.Text.ToLower();
-            
-            if (string.IsNullOrEmpty(searchText) || searchText == "search projects...")
-            {
-                lstProjects.ItemsSource = allProjects;
-            }
-            else
-            {
-                var filtered = allProjects.Where(p => 
-                    p.DisplayName.ToLower().Contains(searchText) ||
-                    p.ProjectName.ToLower().Contains(searchText) ||
-                    p.ProjectNumber.Contains(searchText)
-                ).ToList();
-                
-                lstProjects.ItemsSource = filtered;
-            }
+            bool hasSearch = !string.IsNullOrEmpty(searchText) && searchText != "search projects...";
+
+            var filtered = allProjects.Where(p =>
+                (showCancelled || p.Status != "Cancelled") &&
+                (!hasSearch || p.DisplayName.ToLower().Contains(searchText) ||
+                              p.ProjectName.ToLower().Contains(searchText) ||
+                              p.ProjectNumber.Contains(searchText))
+            ).ToList();
+
+            lstProjects.ItemsSource = filtered;
+        }
+
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ApplyProjectFilter();
+        }
+
+        private void ChkShowCancelled_Changed(object sender, RoutedEventArgs e)
+        {
+            ApplyProjectFilter();
         }
 
         private void TxtProjectName_LostFocus(object sender, RoutedEventArgs e)

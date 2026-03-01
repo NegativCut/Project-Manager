@@ -146,14 +146,19 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBox Name="txtSearch" Grid.Row="0" Margin="5,5,5,10" Height="30"
+                    <TextBox Name="txtSearch" Grid.Row="0" Margin="5,5,5,5" Height="30"
                              TextChanged="TxtSearch_TextChanged"
                              Foreground="Gray" Text="Search projects..."/>
 
-                    <ListBox Name="lstProjects" Grid.Row="1" Margin="5"
+                    <CheckBox Name="chkShowCancelled" Grid.Row="1" Content="Show Cancelled"
+                              Margin="8,0,5,8" IsChecked="False"
+                              Checked="ChkShowCancelled_Changed" Unchecked="ChkShowCancelled_Changed"/>
+
+                    <ListBox Name="lstProjects" Grid.Row="2" Margin="5"
                              SelectionChanged="LstProjects_SelectionChanged">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
