@@ -89,6 +89,18 @@ namespace ProjectManager.Data
                     )";
                 ExecuteNonQuery(conn, createProjectDatasheets);
 
+                // ProjectAppPaths table — custom folder path per project/app
+                string createProjectAppPaths = @"
+                    CREATE TABLE IF NOT EXISTS ProjectAppPaths (
+                        ProjectId INTEGER NOT NULL,
+                        AppId INTEGER NOT NULL,
+                        CustomPath TEXT NOT NULL,
+                        PRIMARY KEY (ProjectId, AppId),
+                        FOREIGN KEY (ProjectId) REFERENCES Projects(Id) ON DELETE CASCADE,
+                        FOREIGN KEY (AppId) REFERENCES Apps(Id) ON DELETE CASCADE
+                    )";
+                ExecuteNonQuery(conn, createProjectAppPaths);
+
                 // Settings table
                 string createSettings = @"
                     CREATE TABLE IF NOT EXISTS Settings (
@@ -542,6 +554,55 @@ namespace ProjectManager.Data
             }
 
             return datasheets;
+        }
+
+        // ProjectAppPaths operations
+        public string GetAppPath(int projectId, int appId)
+        {
+            using (var conn = new SQLiteConnection(connectionString))
+            {
+                conn.Open();
+                string sql = "SELECT CustomPath FROM ProjectAppPaths WHERE ProjectId = @projectId AND AppId = @appId";
+                using (var cmd = new SQLiteCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@projectId", projectId);
+                    cmd.Parameters.AddWithValue("@appId", appId);
+                    var result = cmd.ExecuteScalar();
+                    return result != null ? result.ToString() : null;
+                }
+            }
+        }
+
+        public void SetAppPath(int projectId, int appId, string path)
+        {
+            using (var conn = new SQLiteConnection(connectionString))
+            {
+                conn.Open();
+                string sql = @"INSERT OR REPLACE INTO ProjectAppPaths (ProjectId, AppId, CustomPath)
+                               VALUES (@projectId, @appId, @path)";
+                using (var cmd = new SQLiteCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@projectId", projectId);
+                    cmd.Parameters.AddWithValue("@appId", appId);
+                    cmd.Parameters.AddWithValue("@path", path);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void ClearAppPath(int projectId, int appId)
+        {
+            using (var conn = new SQLiteConnection(connectionString))
+            {
+                conn.Open();
+                string sql = "DELETE FROM ProjectAppPaths WHERE ProjectId = @projectId AND AppId = @appId";
+                using (var cmd = new SQLiteCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@projectId", projectId);
+                    cmd.Parameters.AddWithValue("@appId", appId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
         // Settings operations

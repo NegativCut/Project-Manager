@@ -143,16 +143,88 @@ namespace ProjectManager
 
             foreach (var app in projectApps)
             {
+                // Resolve path: custom override or default
+                string defaultPath = Path.Combine(engineeringRoot, app.AppName, project.FolderName);
+                string customPath = db.GetAppPath(project.Id, app.Id);
+                string appPath = customPath ?? defaultPath;
+                bool hasCustomPath = customPath != null;
+
+                // GroupBox header: app name + Set Path / Reset buttons
+                var headerPanel = new StackPanel { Orientation = Orientation.Horizontal };
+                headerPanel.Children.Add(new TextBlock
+                {
+                    Text = app.AppName,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = System.Windows.Media.Brushes.White
+                });
+
+                var btnSetPath = new Button
+                {
+                    Content = "Set Path...",
+                    Margin = new Thickness(10, 0, 0, 0),
+                    Padding = new Thickness(6, 2, 6, 2),
+                    Tag = new object[] { project, app }
+                };
+                btnSetPath.Click += (s, e) =>
+                {
+                    var tag = (object[])((Button)s).Tag;
+                    var proj = (Project)tag[0];
+                    var appInfo = (AppInfo)tag[1];
+                    string current = db.GetAppPath(proj.Id, appInfo.Id)
+                                     ?? Path.Combine(engineeringRoot, appInfo.AppName, proj.FolderName);
+                    var dlg = new System.Windows.Forms.FolderBrowserDialog
+                    {
+                        Description = $"Select folder for {appInfo.AppName}",
+                        SelectedPath = Directory.Exists(current) ? current : engineeringRoot
+                    };
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        db.SetAppPath(proj.Id, appInfo.Id, dlg.SelectedPath);
+                        LoadFiles(proj);
+                        txtStatus.Text = $"{appInfo.AppName} path updated";
+                    }
+                };
+                headerPanel.Children.Add(btnSetPath);
+
+                if (hasCustomPath)
+                {
+                    var btnReset = new Button
+                    {
+                        Content = "Reset",
+                        Margin = new Thickness(5, 0, 0, 0),
+                        Padding = new Thickness(6, 2, 6, 2),
+                        Tag = new object[] { project, app }
+                    };
+                    btnReset.Click += (s, e) =>
+                    {
+                        var tag = (object[])((Button)s).Tag;
+                        var proj = (Project)tag[0];
+                        var appInfo = (AppInfo)tag[1];
+                        db.ClearAppPath(proj.Id, appInfo.Id);
+                        LoadFiles(proj);
+                        txtStatus.Text = $"{appInfo.AppName} path reset to default";
+                    };
+                    headerPanel.Children.Add(btnReset);
+                }
+
                 var groupBox = new GroupBox
                 {
-                    Header = app.AppName,
+                    Header = headerPanel,
                     Margin = new Thickness(0, 5, 0, 10)
                 };
 
                 var panel = new StackPanel();
-                
-                string appPath = Path.Combine(engineeringRoot, app.AppName, project.FolderName);
-                
+
+                // Show current path
+                panel.Children.Add(new TextBlock
+                {
+                    Text = appPath,
+                    Foreground = System.Windows.Media.Brushes.Gray,
+                    Margin = new Thickness(5, 5, 5, 2),
+                    FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap
+                });
+
                 if (Directory.Exists(appPath))
                 {
                     var btnOpen = new Button
@@ -167,7 +239,7 @@ namespace ProjectManager
                     panel.Children.Add(btnOpen);
 
                     var files = Directory.GetFiles(appPath, "*.*", SearchOption.AllDirectories);
-                    
+
                     if (files.Length == 0)
                     {
                         var lblNoFiles = new TextBlock
@@ -180,7 +252,7 @@ namespace ProjectManager
                     }
                     else
                     {
-                        foreach (var file in files.Take(20)) // Limit display
+                        foreach (var file in files.Take(20))
                         {
                             var fileBtn = new Button
                             {
@@ -213,7 +285,7 @@ namespace ProjectManager
                 {
                     var lblNotCreated = new TextBlock
                     {
-                        Text = "Folder not created yet",
+                        Text = "Folder not found",
                         Foreground = System.Windows.Media.Brushes.White,
                         Margin = new Thickness(5)
                     };
@@ -1395,7 +1467,8 @@ STATUS HISTORY
                 var app = availableApps.FirstOrDefault(a => a.Id == appId);
                 if (app != null)
                 {
-                    string path = Path.Combine(engineeringRoot, app.AppName, currentProject.FolderName);
+                    string path = db.GetAppPath(currentProject.Id, app.Id)
+                                  ?? Path.Combine(engineeringRoot, app.AppName, currentProject.FolderName);
                     if (Directory.Exists(path))
                     {
                         OpenFolder(path);
