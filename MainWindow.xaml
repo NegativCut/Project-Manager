@@ -159,7 +159,13 @@
                               Checked="ChkShowCancelled_Changed" Unchecked="ChkShowCancelled_Changed"/>
 
                     <ListBox Name="lstProjects" Grid.Row="2" Margin="5"
-                             SelectionChanged="LstProjects_SelectionChanged">
+                             SelectionChanged="LstProjects_SelectionChanged"
+                             MouseDoubleClick="LstProjects_MouseDoubleClick">
+                        <ListBox.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Rename Project" Click="BtnRenameProject_Click"/>
+                            </ContextMenu>
+                        </ListBox.ContextMenu>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Margin="5">

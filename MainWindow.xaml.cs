@@ -1294,6 +1294,12 @@ STATUS HISTORY
             }
         }
 
+        private void LstProjects_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (currentProject != null)
+                BtnRenameProject_Click(sender, e);
+        }
+
         private void BtnRenameProject_Click(object sender, RoutedEventArgs e)
         {
             if (currentProject == null) return;

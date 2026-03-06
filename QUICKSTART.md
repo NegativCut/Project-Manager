@@ -96,6 +96,9 @@ This creates:
 - Track project status (Planning → In Progress → Review → Complete)
 - Add notes in the Issues field
 - Search projects by typing in the search box
+- Toggle **"Show Cancelled"** to show/hide cancelled projects
+- **Double-click** a project in the list (or right-click) to rename it
+- Set a **custom folder path** per app in the Files tab if your files live elsewhere
 
 ## Common Workflows
 

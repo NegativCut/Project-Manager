@@ -7,10 +7,13 @@ A Windows desktop application for managing engineering projects across multiple 
 - **Project Numbering**: Auto-incrementing project numbers (0001, 0002, etc.) with format: `0001_ProjectName_Rev1`
 - **Revision Control**: Create new revisions with selective file copying from previous versions
 - **Multi-App Support**: Track which applications are used per project (Altium, Solidworks, Visual Studio, Documents, and custom apps)
+- **Per-Project Custom Folder Paths**: Each app folder path can be overridden per project in the Files tab
 - **Centralized Datasheets**: Link datasheets from a central repository to multiple projects
 - **File Browser**: View and open files directly from the app, organized by software type
 - **To-Do Lists**: Master task list per project, subdivided by application
 - **Directory Management**: Automatically creates and maintains organized folder structures
+- **Project Filtering**: Search box plus Show Cancelled toggle to filter the project list
+- **Inline Rename**: Double-click or right-click any project in the list to rename it
 
 ## Folder Structure
 
@@ -166,10 +169,13 @@ Project data is stored in SQLite database:
 ## Tips
 
 - Use the **Search** box to filter projects by number or name
+- Toggle **Show Cancelled** to include/exclude cancelled projects from the list
 - The app **automatically saves** changes when you edit project details
+- **Double-click a project** in the list to rename it, or right-click for the context menu
 - **Double-click a datasheet** in the grid to open it
 - You can **edit task descriptions and priorities** directly in the grid
 - **Check/uncheck apps** in the Overview tab to add/remove app folders
+- Set a **custom folder path** per app in the Files tab to override the default location
 
 ## Troubleshooting
 
